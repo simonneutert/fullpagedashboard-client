@@ -1,5 +1,7 @@
 # electron-remote-dashboard
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/knalli/electron-remote-dashboard.svg)](https://greenkeeper.io/)
+
 Remote dashboard with a control app
 
 This app starts an Electron based window showing a controlled web view. Additionally, a web server provides
