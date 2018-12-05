@@ -59,4 +59,5 @@ fabric.properties
 /.cache
 
 # Unsorted
+package-lock.json
 
