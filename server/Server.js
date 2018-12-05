@@ -4,6 +4,14 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 
+const ip = require('underscore')
+    .chain(require('os').networkInterfaces())
+    .values()
+    .flatten()
+    .find({family: 'IPv4', internal: false})
+    .value()
+    .address;
+
 class Server extends EventEmitter {
 
   constructor(config) {
@@ -13,6 +21,7 @@ class Server extends EventEmitter {
     this.serverPort = config.get('server', 'port', 33333);
     this.appServer = express();
     this.httpServer = http.Server(this.appServer);
+    this.ip = ip;
     this.ioServer = socketIo(this.httpServer);
     this.initialize();
     this.start();
@@ -93,7 +102,8 @@ class Server extends EventEmitter {
 
   start() {
     this.httpServer.listen(this.serverPort, () => {
-      this.emit('server-started', {http : this.httpServer, portStarted : this.serverPort});
+      // TODO: update http value with the actual ip address of the server instead of localhost
+      this.emit('server-started', {http : this.ip, portStarted : this.serverPort});
     });
     //this.emit('dashboards-updated', this.getDashboards());
 
@@ -230,7 +240,7 @@ class Server extends EventEmitter {
   }
 
   getControlServerUrl() {
-    return `http://localhost:${this.serverPort}/`;
+    return `http://${this.ip}:${this.serverPort}/`;
   }
 
   getDashboards() {
