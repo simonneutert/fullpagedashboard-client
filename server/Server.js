@@ -102,10 +102,8 @@ class Server extends EventEmitter {
 
   start() {
     this.httpServer.listen(this.serverPort, () => {
-      // TODO: update http value with the actual ip address of the server instead of localhost
       this.emit('server-started', {http : this.ip, portStarted : this.serverPort});
     });
-    //this.emit('dashboards-updated', this.getDashboards());
 
     if (this.config.get('dashboards', 'active')) {
       console.log(`Loading dashboard "${this.config.get('dashboards', 'active')}"...`);
