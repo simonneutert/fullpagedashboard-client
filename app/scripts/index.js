@@ -12,13 +12,19 @@
     const errorText = document.getElementById('errorText')
     const canvasElement = document.getElementById('canvas')
     if (canvasElement){
+      //https://github.com/soldair/node-qrcode
       const QRCode = require('qrcode')
-      QRCode.toCanvas(canvasElement, message.url, (error) => {
+      let qropts = {
+        errorCorrectionLevel: 'H',
+        type: 'image/jpeg',
+        width: '400'
+      }
+      QRCode.toCanvas(canvasElement, message.url, qropts, (error) => {
         if(error){
           errorText.innerHTML = "error in QRCode"
         }
         else {
-          errorText.innerHTML = "Scan the following URL with your smartphone to open the dashboard management console in your browser"
+          errorText.innerHTML = "Or scan the QR Code with your smartphone"
         }
       })
     }
