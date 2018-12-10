@@ -86,6 +86,14 @@ angular.module('app')
       });
     });
 
+    // socket.on('screenshot-response', (imageData) => {
+      $rootScope.$on('screenshot-response', (imageData) => {
+        console.log('screenshot-response');
+      // console.log(imageData);
+      // let previewImage = document.getElementById('tabPreview');
+      // previewImage.src = imageData;
+    })
+
     $rootScope.$on('server-connected', function () {
       me.states.connected = true;
     });

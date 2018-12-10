@@ -18,10 +18,7 @@ let mainWindow;
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    // width : config.get('window', 'width', 1024),
-    // height : config.get('window', 'height', 768),
     fullscreen : true//,
-    // titleBarStyle : config.get('window', 'titleBarStyle', 'hidden')
   });
 
   // and load the index.html of the app.
@@ -39,6 +36,7 @@ const createWindow = () => {
     ipcMain.on('webview-refreshed', (event, data) => server.emit('view-updated', data));
     ipcMain.on('webview-favicons-refreshed', (event, data) => server.emit('view-favicons-updated', data));
     ipcMain.on('webview-response-refreshed', (event, data) => server.emit('view-response-updated', data));
+    // ipcMain.on('test', (event, data) => console.log(`test: ${data}`));
   });
 
   // Emitted when the window is closed.
@@ -78,6 +76,7 @@ app.on('activate', () => {
 server.on('view-set-url', ({url}) => {
   //mainWindow.loadURL(url);
   mainWindow.webContents.send('open-url', url);
+  console.log(`main: url: ${url}`);
   mainWindow.webContents.send('screenshot-request');
 });
 
