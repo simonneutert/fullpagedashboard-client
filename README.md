@@ -1,6 +1,6 @@
-# FullPageDashboard Client v2 (alpha 0.1.0)
+# FullPageDashboard Client v2 (0.1.1 alpha)
 
-FullPageDashboard Client v2 is an **Electron app for full screen display of websites/dashboards**. It is built with [FullPageOS[(https://github.com/guysoft/FullPageOS)] as a host environment in mind, but can actually be used for any Electron-supoortive enviroment. 
+FullPageDashboard Client v2 is an **Electron app for full screen display of websites/dashboards**. It is built with [FullPageOS](https://github.com/guysoft/FullPageOS) as a host environment in mind, but can actually be used for any Electron-supoortive enviroment. 
 
 This alpha version has not been integrated or tested with [FullPageOS](https://github.com/guysoft/FullPageOS) yet. [Please help test it on Raspberry Pi 3](https://github.com/tailorvj/fullpagedashboard-client/issues/1). 
 
