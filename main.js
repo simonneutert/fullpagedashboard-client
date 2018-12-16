@@ -48,17 +48,20 @@ const createWindow = () => {
         console.log(`myWebContents dom-ready`)
         //create a screenshot every time a webpage finished loading into the webview. Returns NativeImage
         mainWindow.focus();
-        myWebContents.capturePage((image)=>{
-          if (image.isEmpty()){
-            console.log('main.js myWebContents dom-ready: screenshot is empty')
-            console.log(`main.js myWebContents dom-ready: image.getSize(): ${image.getSize().width}`)
-          }
-          else {
-            console.log(`main.js myWebContents dom-ready: emitting server screenshot-message with screenshot image base64 data`)
-            //console.log(`main.js myWebContents dom-ready: image.toDataURL(): ${image.toDataURL()}`);
-            server.emit('screenshot-message', image.toDataURL());
-          }
-        })
+        setTimeout(() => {
+          myWebContents.capturePage((image)=>{
+            if (image.isEmpty()){
+              console.log('main.js myWebContents dom-ready: screenshot is empty')
+              console.log(`main.js myWebContents dom-ready: image.getSize(): ${image.getSize().width}`)
+            }
+            else {
+              console.log(`main.js myWebContents dom-ready: emitting server screenshot-message with screenshot image base64 data`)
+              //console.log(`main.js myWebContents dom-ready: image.toDataURL(): ${image.toDataURL()}`);
+              server.emit('screenshot-message', image.toDataURL());
+            }
+          })
+        }, 500);
+        
       })
     })
   // Emitted when the window is closed.
