@@ -1,7 +1,7 @@
 {
   "name": "fullpagedashboard-client",
   "version": "0.1.0",
-  "description": "Remote dashboard with a control app for FullPageOS",
+  "description": "Remote dashboard with a control app for FullPageOS. Ver 0.1.0 alpha",
   "repository": {
     "type": "git",
     "url": "https://github.com/tailorvj/fullpagedashboard-client"
