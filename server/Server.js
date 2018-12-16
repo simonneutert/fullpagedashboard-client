@@ -4,6 +4,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 
+//code from stackexchange. TODO: credit original author
 const ip = require('underscore')
     .chain(require('os').networkInterfaces())
     .values()
@@ -74,6 +75,7 @@ class Server extends EventEmitter {
         socket.emit('view-updated', this.webviewData);
       }
     });
+
     this.on('state-changed', (name, value) => {
       this.states[name] = value;
       this.ioServer.emit('states-updated', this.states);
@@ -98,6 +100,7 @@ class Server extends EventEmitter {
       this.webviewData.lastResponse = response;
       this.ioServer.emit('view-updated', this.webviewData);
     });
+    this.on('screenshot-message', (data) => { this.ioServer.emit('screenshot-message', data)} );
   }
 
   start() {

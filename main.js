@@ -15,13 +15,12 @@ new OnlineStatusManager(__dirname).on('changed', (isOnline) => server.emit('stat
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
+let webviewAttached = false;
+
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    // width : config.get('window', 'width', 1024),
-    // height : config.get('window', 'height', 768),
     fullscreen : true//,
-    // titleBarStyle : config.get('window', 'titleBarStyle', 'hidden')
   });
 
   // and load the index.html of the app.
@@ -34,13 +33,34 @@ const createWindow = () => {
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('server-started', {url : server.getControlServerUrl()});
-
     // forward webview event metrics
-    ipcMain.on('webview-refreshed', (event, data) => server.emit('view-updated', data));
-    ipcMain.on('webview-favicons-refreshed', (event, data) => server.emit('view-favicons-updated', data));
-    ipcMain.on('webview-response-refreshed', (event, data) => server.emit('view-response-updated', data));
+    // ipcMain.on('webview-refreshed', (event, data) => server.emit('view-updated', data));
+    // ipcMain.on('webview-favicons-refreshed', (event, data) => server.emit('view-favicons-updated', data));
+    // ipcMain.on('webview-response-refreshed', (event, data) => server.emit('view-response-updated', data));
   });
-
+    //did-attach-view event happens only once
+    mainWindow.webContents.on('did-attach-webview', (event, myWebContents) => {
+      console.log(`did-attach-webview: event: ${event}, myWebContents: ${myWebContents}`)
+      //myWebContents is a direct reference to the webview in index.html returned by did-attach-view
+      webviewAttached = true;
+      //dom-ready is an event fired every time a page finished loading into the webview
+      myWebContents.on('dom-ready', () => {
+        console.log(`myWebContents dom-ready`)
+        //create a screenshot every time a webpage finished loading into the webview. Returns NativeImage
+        mainWindow.focus();
+        myWebContents.capturePage((image)=>{
+          if (image.isEmpty()){
+            console.log('main.js myWebContents dom-ready: screenshot is empty')
+            console.log(`main.js myWebContents dom-ready: image.getSize(): ${image.getSize().width}`)
+          }
+          else {
+            console.log(`main.js myWebContents dom-ready: emitting server screenshot-message with screenshot image base64 data`)
+            //console.log(`main.js myWebContents dom-ready: image.toDataURL(): ${image.toDataURL()}`);
+            server.emit('screenshot-message', image.toDataURL());
+          }
+        })
+      })
+    })
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
@@ -75,11 +95,26 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-server.on('view-set-url', ({url}) => {
-  //mainWindow.loadURL(url);
-  mainWindow.webContents.send('open-url', url);
-  mainWindow.webContents.send('screenshot-request');
-});
+  //makes sure webview URL is sent only when the webview is actually available
+  server.on('view-set-url', ({url}) => {
+    if(webviewAttached){
+      mainWindow.webContents.send('open-url', url);
+      console.log(`main: url: ${url}`);
+    }
+    else {
+    //console.log('server view-set-url webview is not attached yet');
+    mainWindow.webContents.send('open-url', url);
+    try {
+        setTimeout(() => {
+          console.log('server view-set-url webview is not attached yet');
+          server.emit('view-set-url', ({url}));
+        }, 500);
+      }
+      catch(err){
+        console.log(err);
+      }
+    }
+  });      
 
 server.on('server-started', ({portStarted}) => {
   console.log(`Server started @ ${portStarted}`);
@@ -93,3 +128,4 @@ server.on('dashboard-updated', (dashboards) => {
 server.on('toggle-fullscreen', () => {
   mainWindow.setFullScreen(!mainWindow.isFullScreen());
 });
+

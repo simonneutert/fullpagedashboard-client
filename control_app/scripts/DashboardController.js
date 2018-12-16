@@ -85,6 +85,18 @@ angular.module('app')
         webview.lastResponse = data.lastResponse;
       });
     });
+    
+    socket.on('screenshot-message', function(data){
+      console.log(`screenshot-message: ${data}`);
+      //TODO: find out what the $rootScope is in Angular
+      // $rootScope.$on('screenshot-message', (imageData) => {
+        // console.log('screenshot-message');
+        // console.log(imageData);
+        let previewImage = document.getElementById('tabPreview');
+        previewImage.src = data;
+    // })
+
+    });
 
     $rootScope.$on('server-connected', function () {
       me.states.connected = true;
@@ -123,12 +135,6 @@ angular.module('app')
                 .position('bottom right')
                 .hideDelay(2000)
             );
-
-            // hack
-            setTimeout(function () {
-              var img = document.getElementById('tabPreview');
-              img.src = img.src; // reload hack
-            }, 2000);
           }
         });
       });

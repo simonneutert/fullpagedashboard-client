@@ -36,16 +36,4 @@
     document.getElementById('webview').src = url
     document.getElementById('webview').style.display = 'flex'
   })
-
-// Incoming request making a screenshot
-  ipcRenderer.on('screenshot-request', () => {
-    console.log('Requesting screenshot...')
-    var screenshot = require('electron-screenshot')
-    const filename = '.cache/current-view.png'
-    screenshot({filename : filename, delay : 2000}, () => {
-      console.log('Screenshot taken')
-      ipcRenderer.emit('screenshot-response', filename)
-    })
-  })
-
 }
