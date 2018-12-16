@@ -132,3 +132,6 @@ server.on('toggle-fullscreen', () => {
   mainWindow.setFullScreen(!mainWindow.isFullScreen());
 });
 
+process.on('uncaughtException', (err) => {
+  console.log(err);
+});
