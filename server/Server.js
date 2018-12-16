@@ -100,6 +100,7 @@ class Server extends EventEmitter {
       this.webviewData.lastResponse = response;
       this.ioServer.emit('view-updated', this.webviewData);
     });
+    this.on('screenshot-message', (data) => { this.ioServer.emit('screenshot-message', data)} );
   }
 
   start() {

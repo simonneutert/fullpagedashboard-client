@@ -35,31 +35,5 @@
     document.getElementById('splashscreen').style.display = 'none'
     document.getElementById('webview').src = url
     document.getElementById('webview').style.display = 'flex'
-    ipcRenderer.send('test', 'test');
   })
-
-// Incoming request making a screenshot
-  // ipcRenderer.on('screenshot-request', () => {
-  //   console.log('Requesting screenshot...')
-  //   var screenshot = require('electron-screenshot')
-  //   const filename = '.cache/current-view.png'
-  //   screenshot({filename : filename, delay : 2000}, () => {
-  //     console.log('Screenshot taken')
-  //     ipcRenderer.emit('screenshot-response', filename)
-  //   })
-  // })
-
- ipcRenderer.on('screenshot-request', () => {
-  // ipcRenderer.send('screenshot-response', 'imageData')
-  // console.log('Requesting screenshot...')
-  // const appScreenshot = require('./lib/appScreenshot')
-  // //const filename = '.cache/current-view.png'
-  // appScreenshot({imageFormat: 'image/png'}, 
-  //   (imageData) => {
-  //     console.log('Screenshot taken')
-  //     ipcRenderer.emit('screenshot-response', imageData)
-  //     });
-  return true;
-    })
-
 }
