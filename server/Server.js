@@ -4,6 +4,15 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 
+//code from stackexchange. TODO: credit original author
+const ip = require('underscore')
+    .chain(require('os').networkInterfaces())
+    .values()
+    .flatten()
+    .find({family: 'IPv4', internal: false})
+    .value()
+    .address;
+
 class Server extends EventEmitter {
 
   constructor(config) {
@@ -13,6 +22,7 @@ class Server extends EventEmitter {
     this.serverPort = config.get('server', 'port', 33333);
     this.appServer = express();
     this.httpServer = http.Server(this.appServer);
+    this.ip = ip;
     this.ioServer = socketIo(this.httpServer);
     this.initialize();
     this.start();
@@ -65,6 +75,7 @@ class Server extends EventEmitter {
         socket.emit('view-updated', this.webviewData);
       }
     });
+
     this.on('state-changed', (name, value) => {
       this.states[name] = value;
       this.ioServer.emit('states-updated', this.states);
@@ -89,13 +100,13 @@ class Server extends EventEmitter {
       this.webviewData.lastResponse = response;
       this.ioServer.emit('view-updated', this.webviewData);
     });
+    this.on('screenshot-message', (data) => { this.ioServer.emit('screenshot-message', data)} );
   }
 
   start() {
     this.httpServer.listen(this.serverPort, () => {
-      this.emit('server-started', {http : this.httpServer, portStarted : this.serverPort});
+      this.emit('server-started', {http : this.ip, portStarted : this.serverPort});
     });
-    //this.emit('dashboards-updated', this.getDashboards());
 
     if (this.config.get('dashboards', 'active')) {
       console.log(`Loading dashboard "${this.config.get('dashboards', 'active')}"...`);
@@ -230,7 +241,7 @@ class Server extends EventEmitter {
   }
 
   getControlServerUrl() {
-    return `http://localhost:${this.serverPort}/`;
+    return `http://${this.ip}:${this.serverPort}/`;
   }
 
   getDashboards() {
