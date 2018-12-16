@@ -60,7 +60,7 @@ const createWindow = () => {
               server.emit('screenshot-message', image.toDataURL());
             }
           })
-        }, 500);
+        }, 1000);
         
       })
     })
