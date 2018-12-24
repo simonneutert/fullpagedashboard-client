@@ -4,7 +4,8 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 
-//code from stackexchange. TODO: credit original author
+//code snippet from stackeoverflow user vault. https://stackoverflow.com/questions/3653065/get-local-ip-address-in-node-js/31003950#31003950
+//a hack to get a local ip address of the server machine from the list of network interfaces
 const ip = require('underscore')
     .chain(require('os').networkInterfaces())
     .values()
@@ -29,9 +30,9 @@ class Server extends EventEmitter {
   }
 
   initialize() {
-    let appBasePath = `${__dirname}/../control_app`;
-    let dependenciesPath = `${__dirname}/../node_modules`;
-    let cachePath = `${__dirname}/../.cache`;
+    const appBasePath = `${__dirname}/../control_app`;
+    const dependenciesPath = `${__dirname}/../node_modules`;
+    const cachePath = `${__dirname}/../.cache`;
     this.appServer.use('/', express.static(appBasePath));
     this.appServer.use('/node_modules', express.static(dependenciesPath));
 
@@ -48,6 +49,7 @@ class Server extends EventEmitter {
     this.webviewData = {};
 
     // bridge Socket.IO events
+    //TODO: refactor to Promises instead of callbacks
     this.ioServer.on('connection', (socket) => {
       socket.on('list-dashboards', (fn) => {
         fn(this.getDashboards());
@@ -80,6 +82,7 @@ class Server extends EventEmitter {
       this.states[name] = value;
       this.ioServer.emit('states-updated', this.states);
     });
+    //TODO: refactor to use generator hack instead of object keys
     this.on('states-changed', (data) => {
       for (let key of Object.keys(data)) {
         this.states[key] = data[key];
