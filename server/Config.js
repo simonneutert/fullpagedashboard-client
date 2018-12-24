@@ -48,6 +48,7 @@ class Config extends EventEmitter {
     return this;
   }
 
+  //TODO: implement new schedule mechanism instead
   load() {
     try {
       this.data = require(`${this._configDirPath}/.session.json`);
