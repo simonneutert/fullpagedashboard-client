@@ -20,7 +20,7 @@ let webviewAttached = false;
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    fullscreen : true//,
+    fullscreen : true
   });
 
   // and load the index.html of the app.
@@ -40,30 +40,29 @@ const createWindow = () => {
   });
     //did-attach-view event happens only once
     mainWindow.webContents.on('did-attach-webview', (event, myWebContents) => {
-      console.log(`did-attach-webview: event: ${event}, myWebContents: ${myWebContents}`)
+      console.log(`did-attach-webview: event: ${event}, myWebContents: ${myWebContents}`);
       //myWebContents is a direct reference to the webview in index.html returned by did-attach-view
       webviewAttached = true;
       //dom-ready is an event fired every time a page finished loading into the webview
       myWebContents.on('dom-ready', () => {
-        console.log(`myWebContents dom-ready`)
+        console.log(`myWebContents dom-ready`);
         //create a screenshot every time a webpage finished loading into the webview. Returns NativeImage
         mainWindow.focus();
         setTimeout(() => {
           myWebContents.capturePage((image)=>{
             if (image.isEmpty()){
-              console.log('main.js myWebContents dom-ready: screenshot is empty')
-              console.log(`main.js myWebContents dom-ready: image.getSize(): ${image.getSize().width}`)
+              console.log('main.js myWebContents dom-ready: screenshot is empty');
+              console.log(`main.js myWebContents dom-ready: image.getSize(): ${image.getSize().width}`);
             }
             else {
               console.log(`main.js myWebContents dom-ready: emitting server screenshot-message with screenshot image base64 data`)
-              //console.log(`main.js myWebContents dom-ready: image.toDataURL(): ${image.toDataURL()}`);
               server.emit('screenshot-message', image.toDataURL());
             }
           })
         }, 1000);
         
-      })
-    })
+      });
+    });
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
@@ -124,6 +123,7 @@ server.on('server-started', ({portStarted}) => {
 });
 
 server.on('dashboard-updated', (dashboards) => {
+  console.log('main.js:126: dashboard-updated.');
   //app.clearRecentDocuments();
   //app.addRecentDocument('/Users/USERNAME/Desktop/work.type');
 });

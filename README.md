@@ -1,5 +1,19 @@
 # FullPageDashboard Client v2 (0.1.1 alpha)
 
+## Task: update code to ES6 - add to changelog when released
+
+* At work in this feature. Files converted:
+    * app/scripts/index.js - Done
+    * app/scripts/webview-helper.js - Done
+    * control_app/scripts/AppController.js - Done
+    * control_app/scripts/DashboardController.js - Done
+    * server/Config.js - Done
+    * server/OnlineStatusManager.js - Done
+    * server/Server.js - Done
+    * main.js - Done
+
+I actually wanted to dive deeper into the conversion to ES6, but since I intend to completely rebuild the monitor app in this sprint for the sake of schedule uploading and display monitoring, it doesn't make since to do so. The main areas of the code that require function refactoring, are related to the admin dashboard, which is written in Angular and going to be removed and replaced with a React.js codebase. So, we are done with the ES6 conversion for now. All code from this point further will be implemented in ES6 only. 
+
 FullPageDashboard Client v2 is an **Electron app for full screen display of websites/dashboards**. It is built with [FullPageOS](https://github.com/guysoft/FullPageOS) as a host environment in mind, but can actually be used for any Electron-supoortive enviroment. 
 
 This alpha version has not been integrated or tested with [FullPageOS](https://github.com/guysoft/FullPageOS) yet. [Please help test it on Raspberry Pi 3](https://github.com/tailorvj/fullpagedashboard-client/issues/1). 
