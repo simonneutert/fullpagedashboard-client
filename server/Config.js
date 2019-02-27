@@ -10,6 +10,7 @@ class Config extends EventEmitter {
     this.basePath = basePath;
 
     // ensure settings exist
+    // this defines path for config and session files
     const projectName = require(`${this.basePath}/package.json`).name;
     this._configDirPath = `${os.homedir()}/.${projectName}`;
     try {
@@ -28,7 +29,9 @@ class Config extends EventEmitter {
       }
     }
 
-    this.load();
+    // this.load('playlist-rgb.1.json');
+    
+    this.load('.session.json');
   }
 
   get(group, key, defaultValue) {
@@ -48,14 +51,13 @@ class Config extends EventEmitter {
     return this;
   }
 
-  //TODO: implement new schedule mechanism instead
-  load() {
+  load(fileName) {
     try {
-      this.data = require(`${this._configDirPath}/.session.json`);
+      this.data = require(`${this._configDirPath}/${fileName}`);
     } catch (ignored) {
       console.log('Either no session or an invalid/corrupted one, try initial config...');
       try {
-        this.data = require(`${this._configDirPath}/config.json`);
+        this.data = require(`${this._configDirPath}/default.json`);
       } catch (ignored) {
         console.log('Either no config or an invalid/corrupted one, using internal defaults...');
         this.data = {};
@@ -64,14 +66,6 @@ class Config extends EventEmitter {
 
     if (!this.data.dashboards) {
       this.data.dashboards = {};
-    }
-
-    if (!this.data.server) {
-      this.data.server = {};
-    }
-
-    if (!this.data.window) {
-      this.data.window = {};
     }
 
   }
@@ -88,7 +82,8 @@ class Config extends EventEmitter {
             url : item.url,
             description : item.description,
             username : item.username,
-            password : item.password
+            password : item.password,
+            duration: item.duration
           };
         })
       },

@@ -35,5 +35,5 @@
     document.getElementById('splashscreen').style.display = 'none';
     document.getElementById('webview').src = url;
     document.getElementById('webview').style.display = 'flex';
-  })
+  });
 }

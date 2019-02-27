@@ -204,7 +204,6 @@ angular.module('app')
         
       var useFullScreen = ($mdMedia('sm') || $mdMedia('xs')) && $scope.customFullscreen;
       $mdDialog.show({
-        //TODO: convert to ES6
         controller: function ($scope, $mdDialog) {
           $scope.hide = () => {
             $mdDialog.hide();

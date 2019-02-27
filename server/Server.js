@@ -8,6 +8,7 @@ const socketIo = require('socket.io');
 //a hack to get a local ip address of the server machine from the list of network interfaces
 //setting host global variable. 
 let host = '';
+
 try{
   host = require('underscore')
   .chain(require('os').networkInterfaces())
@@ -19,6 +20,10 @@ try{
 } catch(err){
   host = 'raspberrypi.local';
 }
+
+//global variable for rotateItems() setTimeout(). 
+//use clearTimeout(netItemTimeout); to cancel next scheduled item.
+let nextItemTimeout = '';
 
 class Server extends EventEmitter {
 
@@ -114,12 +119,16 @@ class Server extends EventEmitter {
     this.on('screenshot-message', (data) => { this.ioServer.emit('screenshot-message', data)} );
   } //initialize
 
-  rotateItems(itemIndex){
+  rotateItems(itemIndex, fn){
 
     const items = this.config.get('dashboards', 'items', []);
-    console.log(`Server.rotateItem(): items: ${items} `);
+
+    items.map((itemObject) => {
+      console.log(`Server.rotateItems: items array member item: ${JSON.stringify(itemObject)}` );
+    });
+
     const item = items[itemIndex];
-    console.log(`Server.rotateItem(): item: ${item} `);
+    console.log(`Server.rotateItems(): would like to display items[${itemIndex}]: ${JSON.stringify(item)} `);
     //there is actually an item. proceed
     if (item !== undefined && item.url !== undefined || 
       (this.config.get('dashboards', 'defaultURL', null)))
@@ -130,8 +139,11 @@ class Server extends EventEmitter {
           if (!success) {
             this.config.put('dashboards', 'active', undefined);
           } else {  
-              //changeDashboard succeeded. Time next item          
-              //default next item index in case we are at the last one
+              //changeDashboard succeeded. Time next item.
+              if (fn) {
+                fn({success : true, message : `item.id ${item.id} loaded successfully`});
+              }        
+              //default next item index in case we are at the last one.
               let nextItemIndex = 0;
               if(itemIndex < (items.length - 1)){
                 //there are still more items
@@ -139,8 +151,8 @@ class Server extends EventEmitter {
               } 
               //make sure there isn't only one item
               if (nextItemIndex !== itemIndex){
-                //set time to run 
-                setTimeout(() => {
+                //set time to run   
+                nextItemTimeout = setTimeout(() => {
                   this.rotateItems(nextItemIndex);
                 }, item.duration || this.config.get('dashboards', 'defaultDuration', 5000));                
               }
@@ -154,46 +166,18 @@ class Server extends EventEmitter {
       this.emit('server-started', {http : this.host, portStarted : this.serverPort});
     });
 
-    if (this.config.get('dashboards', 'active')) {
-      console.log(`Loading dashboard "${this.config.get('dashboards', 'active')}"...`);
+      console.log(`Server.start() calling rotateItems(0)`);
       setTimeout(() => {
-        this.rotateItems(0);
-        // this.changeDashboard(this.config.get('dashboards', 'active'), ({success}) => {
-        //   if (!success) {
-        //     this.config.put('dashboards', 'active', undefined);
-        //   }
-        // });
+        this.rotateItems(0, (result) => {
+          if(result.success){
+            console.log('server.start(): server.rotateItems returned success');
+          }
+        });
       }, 1000);
-    } else {
-      this.config.save();
-    }
-  } //start
-
-  // start() {
-  //   this.httpServer.listen(this.serverPort, () => {
-  //     this.emit('server-started', {http : this.host, portStarted : this.serverPort});
-  //   });
-
-  //   const allDashboards = this.getDashboards();
-
-  //   if (allDashboards.items.length){
-  //     console.log(`Server.start(), running first dashboard item and timing the next`);
-
-
-  //   }
-  //   if (this.config.get('dashboards', 'active')) {
-  //     console.log(`Loading dashboard "${this.config.get('dashboards', 'active')}"...`);
-  //     setTimeout(() => {
-  //       this.changeDashboard(this.config.get('dashboards', 'active'), ({success}) => {
-  //         if (!success) {
-  //           this.config.put('dashboards', 'active', undefined);
-  //         }
-  //       });
-  //     }, 1000);
-  //   } else {
-  //     this.config.save();
-  //   }
-  // } //start
+    // } else {
+      // this.config.save();
+    // }
+  }
 
   changeDashboard(dashboardId, fn) {
     let dashboard = this.config.get('dashboards', 'items', []).filter((db) => db.id === dashboardId)[0];
