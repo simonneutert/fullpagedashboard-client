@@ -215,11 +215,25 @@ class Server extends EventEmitter {
         const items = this.config.get('dashboards', 'items', []);
         items.push(dashboard);
         this.config.put('dashboards', 'items', items);
+
         if (fn) {
           fn({success : true});
         }
         this.ioServer.emit('dashboards-updated', this.getDashboards());
         this.config.save();
+
+        //start running the first dashboard if list was empty before
+        if (items.length <= 2){
+          console.log(`Server.CreateDashboard() calling rotateItems(0)`);
+          setTimeout(() => {
+            this.rotateItems(0, (result) => {
+              if(result.success){
+                console.log('server.CreateDashboard(): server.rotateItems returned success');
+              }
+            });
+          }, 1000);
+              
+        }
       }
     }
   } //createDashboard
