@@ -275,6 +275,7 @@ class Server extends EventEmitter {
           db.description = inDashboardUpdate.description;
           db.username = inDashboardUpdate.username;
           db.password = inDashboardUpdate.password;
+          db.duration = inDashboardUpdate.duration;
         });
       this.config.put('dashboards', 'items', items);
       if (fn) {

@@ -86,6 +86,7 @@ angular.module('app')
         webview.description = $sce.trustAsHtml(data.description);
         webview.url = data.url;
         webview.lastResponse = data.lastResponse;
+        webview.duration = data.duration;
       });
     });
     
@@ -120,27 +121,27 @@ angular.module('app')
     });
 
     this.applyActive = (dashboardId) => {
-      socket.emit('change-dashboard', dashboardId, (result) => {
-        $scope.$apply(() => {
-          if (!result.success) {
-            me.pendingDashboard = me.activeDashboard;
-            $mdDialog.show(
-              $mdDialog.alert()
-                .title('Failed')
-                .textContent(result.message || 'Could not apply the dashboard.')
-                .ok('Dismiss')
-            );
-          } else {
-            me.activeDashboard = dashboardId;
-            $mdToast.show(
-              $mdToast.simple()
-                .textContent('Changed.')
-                .position('bottom right')
-                .hideDelay(2000)
-            );
-          }
-        });
-      });
+      // socket.emit('change-dashboard', dashboardId, (result) => {
+      //   $scope.$apply(() => {
+      //     if (!result.success) {
+      //       me.pendingDashboard = me.activeDashboard;
+      //       $mdDialog.show(
+      //         $mdDialog.alert()
+      //           .title('Failed')
+      //           .textContent(result.message || 'Could not apply the dashboard.')
+      //           .ok('Dismiss')
+      //       );
+      //     } else {
+      //       me.activeDashboard = dashboardId;
+      //       $mdToast.show(
+      //         $mdToast.simple()
+      //           .textContent('Changed.')
+      //           .position('bottom right')
+      //           .hideDelay(2000)
+      //       );
+      //     }
+      //   });
+      // });
     };
 
     this.showCreateDashboardDialog = (ev) => {
