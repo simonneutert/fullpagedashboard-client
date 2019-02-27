@@ -23,10 +23,10 @@ const createWindow = () => {
     fullscreen : true
   });
 
-  // and load the index.html of the app.
+  // and load the index.html of the app. this page loads the webview
   mainWindow.loadURL(`file://${__dirname}/app/index.html`);
 
-  // Open the DevTools.
+  // Open the DevTools if defined in config file.
   if (config.get('window', 'devtools')) {
     mainWindow.webContents.openDevTools();
   }
@@ -98,34 +98,39 @@ app.on('activate', () => {
 // code. You can also put them in separate files and require them here.
 
   //makes sure webview URL is sent only when the webview is actually available
+  //repeatedly calls itself every 500ms until webvewAttached is true. 
   server.on('view-set-url', ({url}) => {
     if(webviewAttached){
       mainWindow.webContents.send('open-url', url);
-      console.log(`main: url: ${url}`);
+      console.log(`main view-set-url webviewAttached: ${webviewAttached} url: ${url}`);
     }
     else {
-    //console.log('server view-set-url webview is not attached yet');
+    //sending a url to webContents could cause webview to be attached
     mainWindow.webContents.send('open-url', url);
-    try {
+
+    //monitor webview state after open-url
+    console.log(`main view-set-url after webContents open-url webviewAttached: ${webviewAttached} url: ${url}`);
+    
+    if(!webviewAttached){
+      try {
         setTimeout(() => {
-          console.log('server view-set-url webview is not attached yet');
+          console.log('server view-set-url webview is not attached yet. re-emitting view-set-url');
           server.emit('view-set-url', ({url}));
         }, 500);
       }
       catch(err){
         console.log(err);
+        }
       }
     }
   });      
 
-server.on('server-started', ({portStarted}) => {
-  console.log(`Server started @ ${portStarted}`);
+server.on('server-started', ({http, portStarted}) => {
+  console.log(`Server started @ ${http}:${portStarted}`);
 });
 
 server.on('dashboard-updated', (dashboards) => {
   console.log('main.js:126: dashboard-updated.');
-  //app.clearRecentDocuments();
-  //app.addRecentDocument('/Users/USERNAME/Desktop/work.type');
 });
 
 server.on('toggle-fullscreen', () => {

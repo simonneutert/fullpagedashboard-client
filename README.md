@@ -1,5 +1,41 @@
 # FullPageDashboard Client v2 (0.1.1 alpha)
 
+## Task: Implement rotation of dashboards according to a default duration setting and/or an item specific duration setting. 
+
+This feature is changing the data model a bit. I initially considered a total rewrite of server/Server.js and server/Config.js, but finally settled on adding a rotation method to Server.js - rotateItems(itemIndex). 
+
+rorateItems receives an index of the item to display, from the dashboards.items[] Array. Each item is an Object with the following key/value pairs in it:
+
+```javascript
+      {
+        "id": "Dashboard Id", //this one can be set in dashboards.active
+        "display": "Display Name",
+        "url": "https://www.example.com",
+        "duration": 60000 // a minute before the next one
+      },
+      {
+        "id": "Dashboard Id 2", //unique. this one can be set in dashboards.active
+        "display": "Display Name",
+        "url": "https://www.example2.com",
+        "duration": 3600000 // an hour before the next item
+      }
+```
+
+### If the items list is empty or in case of error
+
+The default dashboard with instructions is presented in the the 
+top browserWindows (not in the webview). 
+
+TODO: created a different URL response for the error. 
+
+TODO: define whether deveice is in setup mode or not and display
+the right URL accordingly. 
+
+### If there is only one item in dashboards.items[]
+
+Since no rotation is required, duration should be disregarded and 
+the URL set without a timeout to load the next URL. 
+
 ## Task: update code to ES6 - add to changelog when released
 
 * At work in this feature. Files converted:
