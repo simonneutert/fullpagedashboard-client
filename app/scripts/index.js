@@ -17,7 +17,7 @@
       let qropts = {
         errorCorrectionLevel: 'H',
         type: 'image/jpeg',
-        width: '400'
+        width: '300'
       }
       QRCode.toCanvas(canvasElement, message.url, qropts, (error) => {
         if(error){

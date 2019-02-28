@@ -20,7 +20,8 @@ let webviewAttached = false;
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    fullscreen : true
+    fullscreen : true,
+    kiosk: true
   });
 
   // and load the index.html of the app. this page loads the webview
