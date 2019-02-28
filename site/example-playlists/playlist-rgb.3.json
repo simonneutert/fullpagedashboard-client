@@ -1,0 +1,16 @@
+{
+    "dashboards": {
+      "active": "red",
+      "defaultDuration": 30000,
+      "items": [
+        {
+          "id": "red",
+          "display": "Red",
+          "url": "https://simple-milliseconds-counter.herokuapp.com/index.html?bgcolor=red",
+          "duration": 5000
+        }
+      ]
+    },
+    "server": {},
+    "window": {}
+}
