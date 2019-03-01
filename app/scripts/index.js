@@ -1,6 +1,14 @@
 {
   const ipcRenderer = require('electron').ipcRenderer;
 
+  var deviceId;
+  var parameters = new URLSearchParams(window.location.search);
+
+  if (parameters.has('deviceId')){
+      deviceId = parameters.get('deviceId');
+  }
+
+
   ipcRenderer.on('server-started', (event, message) => {
     const wrapper = document.getElementsByClassName('available-url-wrapper')[0];
     if (wrapper) {
