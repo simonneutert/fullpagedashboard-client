@@ -21,7 +21,7 @@ let deviceId = 'unknown';
 
 var exec = require('child_process').exec;
 
-let execScript = exec('~/workspace/fullpageos-experimental-shell-scripts/deviceid.sh',
+let execScript = exec('~/electron/fullpageos-experimental-shell-scripts/deviceid.sh',
    (error, stdout, stderr) => {
     console.log('stdout: ' + stdout);
     console.log('stderr: ' + stderr);
