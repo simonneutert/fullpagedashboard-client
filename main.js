@@ -17,15 +17,29 @@ let mainWindow;
 
 let webviewAttached = false;
 
+let deviceId = 'unknown';
+
+var exec = require('child_process').exec;
+
+let execScript = exec('~/workspace/fullpageos-experimental-shell-scripts/deviceid.sh',
+   (error, stdout, stderr) => {
+    console.log('stdout: ' + stdout);
+    console.log('stderr: ' + stderr);
+});
+execScript.stdout.on('data', (data) =>{
+  deviceId = data;
+});
+
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    fullscreen : true,
-    kiosk: true
+    // kiosk: true,
+    fullscreen : true
   });
+  // mainWindow.webContents.openDevTools();
 
   // and load the index.html of the app. this page loads the webview
-  mainWindow.loadURL(`file://${__dirname}/app/index.html`);
+  mainWindow.loadURL(`file://${__dirname}/app/index.html?deviceId=${deviceId}`);
 
   // Open the DevTools if defined in config file.
   if (config.get('window', 'devtools')) {
@@ -39,7 +53,7 @@ const createWindow = () => {
     // ipcMain.on('webview-favicons-refreshed', (event, data) => server.emit('view-favicons-updated', data));
     // ipcMain.on('webview-response-refreshed', (event, data) => server.emit('view-response-updated', data));
   });
-    //did-attach-view event happens only once
+    //did-attach-webview event happens only once
     mainWindow.webContents.on('did-attach-webview', (event, myWebContents) => {
       console.log(`did-attach-webview: event: ${event}, myWebContents: ${myWebContents}`);
       //myWebContents is a direct reference to the webview in index.html returned by did-attach-view
