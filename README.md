@@ -1,19 +1,24 @@
-# FullPageDashboard Client v2 (0.2.0 experimental)
+# FullPageDashboard Client v2 (0.2.1 experimental)
 
-Download this release from 
+New features in 0.2.1 experimental:
+* Upgraded Electron to version 5.0.0 to solve major security flaw in older Chromium versions. 
 
-New features in 0.2.0 experimental release:
+0.2.0 experimental release features:
 
 * Raspberrry Pi 3 Electron Integration
 * Rotation of dashboards according to a default duration setting and/or an item specific duration setting. 
 * Updated admin dashboard according to new data model
 * Initial code move towards ES6. Still using callback functions. 
 
-FullPageDashboard Client is an **Electron app for full screen display of websites/dashboards**. It is built with [FullPageOS](https://github.com/guysoft/FullPageOS) as a host environment in mind, but can actually be used for any Electron-supportive enviroment. 
+FullPageDashboard Client is an **Electron app for full screen display of web apps / dashboards**. It is practically a remote controlled browser and is a parallel development of our [FullPageOS](https://github.com/guysoft/FullPageOS) distribution for Raspberry Pi, which runs a regular Chromium browser in full screen. 
 
-This experimantal version has not been integrated or tested with [FullPageOS](https://github.com/guysoft/FullPageOS) yet. 
+FullPageDashboard Client can run on Linux(x86, ARM), Mac OS and Windows, however, we are mainly targeting the Raspberry Pi as a deployment environment. 
 
-FullPageDashboard Client has a built-in admin companion app that acts as a remote control. Use it to add/remove/edit URLs and push a URL to the screen. **Please note: Admin app is insecure at the moment. Use at your own risk**
+We are currently working on integrating it into an unofficial Raspbian Pi distribution, using [CustomPiOS](https://github.com/guysoft/CustomPiOS) as a base. 
+
+FullPageDashboard Client has a built-in admin companion app that acts as a remote control. Use it to add/remove/edit URLs and push a URL to the screen. **Please note: Admin app is insecure at the moment. Use at your own risk**. 
+
+We are currently working on a companion cloud control app, to allow you to control a network of device displays from your mobile browser, over the cloud. This will allow administrators (and potentially app servers) to control the content on a network of screens without being on the same local network. 
 
 ## Table of Contents
 
@@ -27,12 +32,12 @@ FullPageDashboard Client has a built-in admin companion app that acts as a remot
 
 These (radical) changes are expected (but not promised) in future releases:
 
-1. Admin dashboard - Mobile friendly and built with React instead of Angular. 
-1. Admin dashboard - May be moved to the cloud for remote control, grouping and performance purposes. 
-1. Player data model - Move to something a bit more standard, with playlists and timing. Player will rotate independently. - started to roll out
-1. Security - Implementation of login mechanism for admin dashboard. 
+1. Admin dashboard - Mobile friendly and built with React instead of Angular. In development.
+1. Admin dashboard - Moved to the cloud for remote control, grouping and performance purposes. In development.
+1. Player data model - Move to something a bit more standard, with playlists and timing. Player will rotate independently. - started to roll out.
+1. Security - Implementation of login mechanism for admin dashboard. In development.
 1. Security - Disable use of keyboard and mouse on the player machine. 
-1. Multiple device management - Admin dashboard will list all devices managed by the admin. 
+1. Multiple device management - Admin dashboard will list all devices managed by the admin. In development.
 1. Location awareness - Each FullPageDashboard Client will have an exact location on a map. 
 1. Development - This project will follow best practices for Git branching and versioning. - started to roll out. Using semantic versioning
 1. Player - Pages will be displayed fully loaded. 
