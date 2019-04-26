@@ -34,6 +34,10 @@ const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     // kiosk: true,
+    webPreferences: {
+      nodeIntegration: true,
+      webviewTag: true
+    },
     fullscreen : true
   });
   // mainWindow.webContents.openDevTools();

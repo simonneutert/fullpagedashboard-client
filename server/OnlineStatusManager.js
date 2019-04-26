@@ -11,7 +11,7 @@ class OnlineStatusManager extends EventEmitter {
 
   init(baseDir) {
     app.on('ready', () => {
-      let window = new BrowserWindow({width : 0, height : 0, show : false});
+      let window = new BrowserWindow({width : 0, height : 0, show : false, webPreferences: {nodeIntegration: true}});
       window.loadURL(`file://${baseDir}/app/online-status.html`);
       //window.webContents.openDevTools();
       ipcMain.on('online-status-changed', (event, status) => {
