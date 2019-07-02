@@ -1,3 +1,4 @@
+//TODO: refactor to a class and separate parts of the codes to external modules
 angular.module('app')
   .controller('DashboardController', function ($rootScope, $mdDialog, $mdMedia, $mdToast, $scope, $sce) {
 
@@ -22,34 +23,36 @@ angular.module('app')
     var socket = io(undefined, {
       timeout: 5000
     });
-    socket.on('connect', function () {
-      $scope.$apply(function () {
+    socket.on('connect', () => {
+      $scope.$apply(() => {
         $rootScope.$emit('server-connected');
       });
     });
-    socket.on('disconnect', function () {
-      $scope.$apply(function () {
+    socket.on('disconnect', () => {
+      $scope.$apply(() => {
         $rootScope.$emit('server-disconnected');
       });
     });
-    socket.on('error', function () {
-      $scope.$apply(function () {
+    socket.on('error', () => {
+      $scope.$apply(() => {
         $rootScope.$emit('server-disconnected');
       });
     });
-    socket.on('reconnect_error', function () {
-      $scope.$apply(function () {
+    socket.on('reconnect_error', () => {
+      $scope.$apply(() => {
         $rootScope.$emit('server-disconnected');
       });
     });
-    socket.on('dashboard-changed', function (dashboard) {
-      $scope.$apply(function () {
+    socket.on('dashboard-changed', (dashboard) => {
+      $scope.$apply(() => {
         me.activeDashboard = dashboard.id;
         me.pendingDashboard = dashboard.id;
       });
     });
-    socket.on('dashboard-updated', function (dashboard) {
-      $scope.$apply(function () {
+
+    //TODO: convert to ES6
+    socket.on('dashboard-updated', (dashboard) => {
+      $scope.$apply(() => {
         for (var i = 0; i < me.items.length; i++) {
           if (me.items[i].id === dashboard.id) {
             me.items[i] = dashboard;
@@ -57,24 +60,24 @@ angular.module('app')
         }
       });
     });
-    socket.on('dashboards-updated', function (dashboards) {
-      $scope.$apply(function () {
+    socket.on('dashboards-updated', (dashboards) => {
+      $scope.$apply(() => {
         me.activeDashboard = dashboards.active;
         me.pendingDashboard = dashboards.active;
         me.items = dashboards.items;
       });
     });
-    socket.on('states-updated', function (args) {
-      $scope.$apply(function () {
+    socket.on('states-updated', (args) => {
+      $scope.$apply(() => {
         if (typeof args.online !== 'undefined') {
           me.states.online = args.online;
         }
       });
     });
-    socket.on('view-updated', function (data) {
+    socket.on('view-updated', (data) => {
       console.log('view updated', data);
-      $scope.$apply(function () {
-        var webview = me.webview;
+      $scope.$apply(() => {
+        const webview = me.webview;
         webview.favicon = data.favicon;
         webview.failed = data.statesFailed || (data.lastResponse && data.lastResponse.httpResponseCode >= 400);
         webview.loading = data.statesLoading;
@@ -83,10 +86,11 @@ angular.module('app')
         webview.description = $sce.trustAsHtml(data.description);
         webview.url = data.url;
         webview.lastResponse = data.lastResponse;
+        webview.duration = data.duration;
       });
     });
     
-    socket.on('screenshot-message', function(data){
+    socket.on('screenshot-message',(data) => {
       console.log(`screenshot-message: ${data}`);
       //TODO: find out what the $rootScope is in Angular
       // $rootScope.$on('screenshot-message', (imageData) => {
@@ -98,17 +102,17 @@ angular.module('app')
 
     });
 
-    $rootScope.$on('server-connected', function () {
+    $rootScope.$on('server-connected', () => {
       me.states.connected = true;
     });
 
-    $rootScope.$on('server-disconnected', function () {
+    $rootScope.$on('server-disconnected', () => {
       me.states.connected = false;
     });
 
-    $rootScope.$on('server-connected', function () {
-      socket.emit('list-dashboards', function (dashboards) {
-        $scope.$apply(function () {
+    $rootScope.$on('server-connected', () => {
+      socket.emit('list-dashboards', (dashboards) => {
+        $scope.$apply(() => {
           me.activeDashboard = dashboards.active;
           me.pendingDashboard = dashboards.active;
           me.items = dashboards.items;
@@ -116,41 +120,42 @@ angular.module('app')
       });
     });
 
-    this.applyActive = function (dashboardId) {
-      socket.emit('change-dashboard', dashboardId, function (result) {
-        $scope.$apply(function () {
-          if (!result.success) {
-            me.pendingDashboard = me.activeDashboard;
-            $mdDialog.show(
-              $mdDialog.alert()
-                .title('Failed')
-                .textContent(result.message || 'Could not apply the dashboard.')
-                .ok('Dismiss')
-            );
-          } else {
-            me.activeDashboard = dashboardId;
-            $mdToast.show(
-              $mdToast.simple()
-                .textContent('Changed.')
-                .position('bottom right')
-                .hideDelay(2000)
-            );
-          }
-        });
-      });
+    this.applyActive = (dashboardId) => {
+      // socket.emit('change-dashboard', dashboardId, (result) => {
+      //   $scope.$apply(() => {
+      //     if (!result.success) {
+      //       me.pendingDashboard = me.activeDashboard;
+      //       $mdDialog.show(
+      //         $mdDialog.alert()
+      //           .title('Failed')
+      //           .textContent(result.message || 'Could not apply the dashboard.')
+      //           .ok('Dismiss')
+      //       );
+      //     } else {
+      //       me.activeDashboard = dashboardId;
+      //       $mdToast.show(
+      //         $mdToast.simple()
+      //           .textContent('Changed.')
+      //           .position('bottom right')
+      //           .hideDelay(2000)
+      //       );
+      //     }
+      //   });
+      // });
     };
 
-    this.showCreateDashboardDialog = function (ev) {
+    this.showCreateDashboardDialog = (ev) => {
       var useFullScreen = ($mdMedia('sm') || $mdMedia('xs')) && $scope.customFullscreen;
       $mdDialog.show({
+        //TODO: convert to ES6
         controller: function ($scope, $mdDialog) {
-          $scope.hide = function () {
+          $scope.hide = () => {
             $mdDialog.hide();
           };
-          $scope.cancel = function () {
+          $scope.cancel = () => {
             $mdDialog.cancel();
           };
-          $scope.answer = function (answer) {
+          $scope.answer = (answer) => {
             $mdDialog.hide(answer);
           };
         },
@@ -160,34 +165,34 @@ angular.module('app')
         clickOutsideToClose: true,
         fullscreen: useFullScreen
       })
-        .then(function (dashboard) {
+        .then((dashboard) => {
           if (dashboard) {
             me.createDashboard(dashboard);
           }
-        }, function () {
-          // TODO
+        }, () => {
+          // TODO: find out what was supposed to be done here :)
         });
     };
 
-    this.showRemoveDashboardDialog = function (ev, dashboardId) {
+    this.showRemoveDashboardDialog = (ev, dashboardId) => {
       var confirm = $mdDialog.confirm()
         .title('Would you like to delete this dashboard?')
         .ariaLabel('Yes')
         .targetEvent(ev)
         .ok('Yes, delete.')
         .cancel('Cancel');
-      $mdDialog.show(confirm).then(function () {
+      $mdDialog.show(confirm).then(() => {
         me.removeDashboard(dashboardId);
         $scope.status = 'You decided to get rid of your debt.';
-      }, function () {
-        // FIXME
+      }, () => {
+        // TODO: find out what was supposed to happen here
       });
     };
 
-    this.showEditDashboardDialog = function (ev, dashboardId) {
+    this.showEditDashboardDialog = (ev, dashboardId) => {
 
-      var dashboard;
-      for (var i = 0; i < me.items.length; i++) {
+      let dashboard;
+      for (let i = 0; i < me.items.length; i++) {
         if (me.items[i].id === dashboardId) {
           dashboard = me.items[i];
           break;
@@ -201,13 +206,13 @@ angular.module('app')
       var useFullScreen = ($mdMedia('sm') || $mdMedia('xs')) && $scope.customFullscreen;
       $mdDialog.show({
         controller: function ($scope, $mdDialog) {
-          $scope.hide = function () {
+          $scope.hide = () => {
             $mdDialog.hide();
           };
-          $scope.cancel = function () {
+          $scope.cancel = () => {
             $mdDialog.cancel();
           };
-          $scope.answer = function (answer) {
+          $scope.answer = (answer) => {
             $mdDialog.hide(answer);
           };
           $scope.dashboard = angular.copy(dashboard);
@@ -219,18 +224,18 @@ angular.module('app')
         clickOutsideToClose: true,
         fullscreen: useFullScreen
       })
-        .then(function (dashboard) {
+        .then((dashboard) => {
           if (dashboard) {
             me.updateDashboard(dashboard);
           }
-        }, function () {
-          // TODO
+        }, () => {
+          // TODO: find out what was supposed to happen here
         });
     };
 
-    this.createDashboard = function (dashboard) {
-      socket.emit('create-dashboard', dashboard, function (result) {
-        $scope.$apply(function () {
+    this.createDashboard = (dashboard) => {
+      socket.emit('create-dashboard', dashboard, (result) => {
+        $scope.$apply(() => {
           if (!result.success) {
             $mdDialog.show(
               $mdDialog.alert()
@@ -250,9 +255,9 @@ angular.module('app')
       });
     };
 
-    this.removeDashboard = function (dashboardId) {
-      socket.emit('remove-dashboard', dashboardId, function (result) {
-        $scope.$apply(function () {
+    this.removeDashboard = (dashboardId) => {
+      socket.emit('remove-dashboard', dashboardId, (result) => {
+        $scope.$apply(() => {
           if (!result.success) {
             $mdDialog.show(
               $mdDialog.alert()
@@ -272,9 +277,9 @@ angular.module('app')
       });
     };
 
-    this.toggleFullscreen = function () {
-      socket.emit('toggle-fullscreen', function (result) {
-        $scope.$apply(function () {
+    this.toggleFullscreen = () => {
+      socket.emit('toggle-fullscreen', (result) => {
+        $scope.$apply(() => {
           if (!result.success) {
             $mdDialog.show(
               $mdDialog.alert()
@@ -294,9 +299,9 @@ angular.module('app')
       });
     };
 
-    this.updateDashboard = function (dashboard) {
-      socket.emit('update-dashboard', dashboard, function (result) {
-        $scope.$apply(function () {
+    this.updateDashboard = (dashboard) => {
+      socket.emit('update-dashboard', dashboard, (result) => {
+        $scope.$apply(() => {
           if (!result.success) {
             $mdDialog.show(
               $mdDialog.alert()
@@ -316,7 +321,7 @@ angular.module('app')
       });
     };
 
-    this.reload = function () {
+    this.reload = () => {
       me.applyActive(me.activeDashboard);
     };
   });

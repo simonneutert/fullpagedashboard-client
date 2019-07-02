@@ -24,7 +24,7 @@
         <md-toolbar class="md-theme-light" ng-class="{'md-warn': !(dashboardCtrl.states.connected && dashboardCtrl.states.online)}">
             <div class="md-toolbar-tools">
                 <h2 class="md-toolbar-tools">
-                    <span>Dashboard Control Unit</span>
+                    <span>Dashboard Control Unit - v 0.2.1 Experimental</span>
                 </h2>
                 <span flex></span>
                 <md-button class="md-raised"
@@ -104,12 +104,12 @@
                            style="position: fixed; bottom: 0; right: 0;">
                     <md-icon md-font-set="material-icons"> add </md-icon>
                 </md-button>
-                <md-button class="md-button md-fullscreen"
+                <!--md-button class="md-button md-fullscreen"
                            aria-label="Fullscreen On/Off"
                            ng-click="dashboardCtrl.toggleFullscreen()"
                            style="position: fixed; bottom: 0; right: 10;">
                     <md-icon md-font-set="material-icons md-light"> launch </md-icon>
-                </md-button>
+                </md-button-->
                 <md-radio-group ng-model="dashboardCtrl.pendingDashboard" class="md-primary"
                                 ng-change="dashboardCtrl.applyActive(dashboardCtrl.pendingDashboard)">
                     <md-radio-button ng-repeat="item in dashboardCtrl.items"

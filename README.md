@@ -1,10 +1,24 @@
-# FullPageDashboard Client v2 (0.1.1 alpha)
+# FullPageDashboard Client v2 (0.2.1 experimental)
 
-FullPageDashboard Client v2 is an **Electron app for full screen display of websites/dashboards**. It is built with [FullPageOS](https://github.com/guysoft/FullPageOS) as a host environment in mind, but can actually be used for any Electron-supoortive enviroment. 
+New features in 0.2.1 experimental:
+* Upgraded Electron to version 5.0.0 to solve major security flaw in older Chromium versions. 
 
-This alpha version has not been integrated or tested with [FullPageOS](https://github.com/guysoft/FullPageOS) yet. [Please help test it on Raspberry Pi 3](https://github.com/tailorvj/fullpagedashboard-client/issues/1). 
+0.2.0 experimental release features:
 
-FullPageDashboard Client has a built-in admin companion app that acts as a remote control. Use it to add/remove/edit URLs and push a URL to the screen. **Please note: Admin app is insecure at the moment. Use at your own risk**
+* Raspberrry Pi 3 Electron Integration
+* Rotation of dashboards according to a default duration setting and/or an item specific duration setting. 
+* Updated admin dashboard according to new data model
+* Initial code move towards ES6. Still using callback functions. 
+
+FullPageDashboard Client is an **Electron app for full screen display of web apps / dashboards**. It is practically a remote controlled browser and is a parallel development of our [FullPageOS](https://github.com/guysoft/FullPageOS) distribution for Raspberry Pi, which runs a regular Chromium browser in full screen. 
+
+FullPageDashboard Client can run on Linux(x86, ARM), Mac OS and Windows, however, we are mainly targeting the Raspberry Pi as a deployment environment. 
+
+We are currently working on integrating it into an unofficial Raspbian Pi distribution, using [CustomPiOS](https://github.com/guysoft/CustomPiOS) as a base. 
+
+FullPageDashboard Client has a built-in admin companion app that acts as a remote control. Use it to add/remove/edit URLs and push a URL to the screen. **Please note: Admin app is insecure at the moment. Use at your own risk**. 
+
+We are currently working on a companion cloud control app, to allow you to control a network of device displays from your mobile browser, over the cloud. This will allow administrators (and potentially app servers) to control the content on a network of screens without being on the same local network. 
 
 ## Table of Contents
 
@@ -18,50 +32,66 @@ FullPageDashboard Client has a built-in admin companion app that acts as a remot
 
 These (radical) changes are expected (but not promised) in future releases:
 
-1. Admin dashboard - Mobile friendly and built with React instead of Angular. 
-1. Admin dashboard - May be moved to the cloud for remote control, grouping and performance purposes. 
-1. Player data model - Move to something a bit more standard, with playlists and timing. Player will rotate independently. 
-1. Security - Implementation of login mechanism for admin dashboard. 
+1. Admin dashboard - Mobile friendly and built with React instead of Angular. In development.
+1. Admin dashboard - Moved to the cloud for remote control, grouping and performance purposes. In development.
+1. Player data model - Move to something a bit more standard, with playlists and timing. Player will rotate independently. - started to roll out.
+1. Security - Implementation of login mechanism for admin dashboard. In development.
 1. Security - Disable use of keyboard and mouse on the player machine. 
-1. Multiple device management - Admin dashboard will list all devices managed by the admin. 
+1. Multiple device management - Admin dashboard will list all devices managed by the admin. In development.
 1. Location awareness - Each FullPageDashboard Client will have an exact location on a map. 
-1. Development - This project will follow best practices for Git branching and versioning. 
+1. Development - This project will follow best practices for Git branching and versioning. - started to roll out. Using semantic versioning
 1. Player - Pages will be displayed fully loaded. 
 
 ## Implementation
 
 ### Installation
 
-1. Clone the git repository and install the node dependencies: `npm install`. Please be ensure having at least NodeJS 4.4 (actually, 4.x should be fine).
+1. Clone the git repository and install the node dependencies: `npm install`. Please ensure having at least NodeJS 4.4 (actually, 4.x should be fine).
 2. Start the app with `npm start`.
 
 ### Configuration and data
 
-* The dashboard app will load and store information at `$userDir/.fullpagedashboard-client/.session.json`.
-* The dashboard app will load information at `$userDir/.fullpagedashboard-client/config.json`.
+* The dashboard app will load and store information at `~/.fullpagedashboard-client/.session.json`.
+* The dashboard app will load default settings from `~/.fullpagedashboard-client/config.json`.
 
 The actual folder is decided in Config.js according to package.json \`name\` setting. 
 
 #### Rules
 
 * If the file `.session.json` is available, it will be preferred.
-* The file `config.json` will be read only.
+* The file `default.json` will be read only.
 * A configuration file can contain three entries: `dashboards`, `server` and `window`.
 
 #### Example config
 
 ```json
 {
-  "dashboards": {
-    "active": "github-knalli",
-    "items": [
-      {
-        "id": "github-knalli",
-        "display": "GitHub knalli",
-        "url": "https://github.com/knalli",
-        "description": "GitHub profile of <em>knalli</em>"
-      }
-  ]
+    "dashboards": {
+      "active": "red",
+      "defaultDuration": 30000,
+      "items": [
+        {
+          "id": "red",
+          "display": "Red",
+          "url": "https://simple-milliseconds-counter.herokuapp.com/index.html?bgcolor=red",
+          "duration": 5000
+        },
+        {
+          "id": "green",
+          "display": "Green",
+          "url": "https://simple-milliseconds-counter.herokuapp.com/index.html?bgcolor=green",
+          "duration": 10000
+        },
+        {
+          "id": "blue",
+          "display": "Blue",
+          "url": "https://simple-milliseconds-counter.herokuapp.com/index.html?bgcolor=blue",
+          "duration": 7000
+        }
+      ]
+    },
+    "server": {},
+    "window": {}
 }
 ```
 
@@ -69,13 +99,14 @@ The actual folder is decided in Config.js according to package.json \`name\` set
 
 `active` is the current selected id of a dashboard. No value means no default, and an invalid one will be removed on startup automatically.
 
-`items` is an array of `dashboard`.
+`items[]` is an array within `dashboards{}`.
 
-`items[].dashboard` contains
+Each `item` (or individual dashboard) within `items[]` contains
 
-* `id` is something unique like `github` or `dashboard1`.
-* `display` is the title/display. It must not be unique, also it should be.
+* `id` is a unique identifier like `red` or `green`.
+* `display` is the title. 
 * `url` is the actual URL of the site. Can be any valid URL a browser/webview can display.
+* `duration` is how many milliseconds to display the URL before the next item. 
 * `description` is an optional field only for the control app.
 
 #### server options
@@ -92,7 +123,7 @@ The player display should be full screen. It tells you the URL for the admin das
 
 Open the admin dashboard in any browser and add/remove/edit URLs in it. 
 
-Press any URL you have defined to send it to the fullscreen display. A screenshot will be presented in the admin dashboard once it is loaded. 
+A screenshot will be presented in the admin dashboard once an item is loaded. 
 
 ![Overview](site/screenshots-overview.png)
 
@@ -100,10 +131,10 @@ Press any URL you have defined to send it to the fullscreen display. A screensho
 
 ### Current Features (from original software + fixed bugs)
 
+*   URLs are rotating according to their item.duration or according to dashboards.defaultDuration.
 *   Session data is persisted between restarts.
 *   A complete "hands free" mode: after the first configuration, all configurations can be applied by the control interface remotely.
 *   Sites/dashboards can be created and removed.
-*   The active dashboard can be switched.
 *   Simultaneous control app interface users (**note: there is currently no security applied**).
 *   The control app provides live feedback between all connected control app users (new active dashboard, online status, ...).
 
@@ -115,16 +146,19 @@ This is an Electron App. It used some non-native modules in it which may or may 
 
 ```javascript
 
+"dependencies": {
     "angular": "~1.5.9",
     "angular-animate": "~1.5.9",
     "angular-aria": "~1.5.9",
-    "angular-material": "~1.1.3",
-    "electron": "^1.4.15",
+    "angular-material": "^1.1.12",
+    "angular-messages": "^1.7.2",
+    "electron": "^3.0.13",
     "eventemitter3": "^2.0.2",
     "express": "^4.14.1",
-    "qrcode": "^1.3.2",
+    "qrcode": "^1.3.3",
     "socket.io": "^2.2.0",
     "underscore": "^1.9.1"
+  }
 
 ```
 
@@ -184,8 +218,6 @@ Admin dashboard control app with a URL set in it.
 
 ## Contributing
 
-**Help Needed:** [build and test on Raspberry Pi 3](https://github.com/tailorvj/fullpagedashboard-client/issues/1).
-
 [Open an issue](https://github.com/tailorvj/fullpagedashboard-client/issues/new) to discuss potential changes/additions. Fork and send pull requests. 
 
 Git repository is managed according to Vincent Driessen's [Git branching model](https://nvie.com/posts/a-successful-git-branching-model/)
@@ -195,6 +227,26 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 **[Back to top](#table-of-contents)**
 
 ## Changelog
+
+### [0.2.0 experimental] - 2019-02-27
+#### Added
+
+* Updated to use Electron 3.0.13 or greater (3.1.4 ATM)
+* Server.rotateItems(itemIndex, fn): Rotation of dashboards according to a default duration setting and/or an item specific duration setting. 
+* Added site/example-playlists folder and two playlists with duration in them. 
+* Deployed milliseconds counter test app to Github and Heroku.
+
+#### Changed
+
+* Pushed version to 0.2.0 due to data model modification. 
+* Server: New dashboard data model. 
+* Angular admin updated accordingly. Will be completely replaced later. Added duration and removed Description fields from CreateDashboardDialog.html.
+* Initial code move towards ES6. Still using callback functions in server. Will move to Promises in the future. 
+
+#### Removed
+
+* Fullscreen button in admin dashboard.
+* Admin set current URL. 
 
 ### [0.1.0] - 2018-12-16
 #### Added
