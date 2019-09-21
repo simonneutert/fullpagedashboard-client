@@ -61,3 +61,4 @@ fabric.properties
 # Unsorted
 package-lock.json
 
+app/scripts/firebase_secrets.js

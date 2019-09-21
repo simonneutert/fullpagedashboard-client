@@ -31,12 +31,27 @@ execScript.stdout.on('data', (data) =>{
 });
 
 const createWindow = () => {
-  // Create the browser window.
+  // Create the hidden browser window
+  hiddenWindow = new BrowserWindow({
+    // show: false,
+    // transparent: true
+    // webPreferences: {
+    //   devTools: true
+    // }
+  });
+  //TEMP !!!!
+  deviceId="5NccG0pAq2HY8a5z2zAC";
+  console.log("opening *** hiddenBrowser *** deviceId="+deviceId);
+  hiddenWindow.loadURL(`file://${__dirname}/app/hiddenBrowser.html?deviceId=${deviceId}`);
+  hiddenWindow.webContents.openDevTools();
+
+  // Create the Content browser window.
   mainWindow = new BrowserWindow({
     // kiosk: true,
     webPreferences: {
       nodeIntegration: true,
-      webviewTag: true
+      webviewTag: true,
+      preload: __dirname + '/app/scripts/preload.js'
     },
     fullscreen : true
   });

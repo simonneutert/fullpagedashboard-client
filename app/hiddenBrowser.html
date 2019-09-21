@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <link rel="shortcut icon" href="assets/images/fullpageos-122x122.png" type="image/x-icon"
+  <title>Pi Jam - Hidden Browser window</title>
+ 
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+  <!-- <script src="scripts/firebase.js"></script> -->
+  <script src="scripts/firebase_secrets.js"></script>  
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js""></script>
+</head>
+<body>
+ 
+ <script src="assets/web/assets/jquery/jquery.min.js"></script>  
+ 
+<script type="text/javascript">
+//    const ipcRenderer = require('electron').ipcRenderer;
+    // const forwardOnlineStatus = () => {
+    //     ipcRenderer.send('online-status-changed', navigator.onLine ? 'online' : 'offline');
+    // };
+
+    // window.addEventListener('online',  forwardOnlineStatus);
+    // window.addEventListener('offline',  forwardOnlineStatus);
+
+    // setTimeout(forwardOnlineStatus, 100);
+
+
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
+var deviceId = getUrlVars()["deviceId"];
+
+ // alert('deviceId='+deviceId);
+ this.localStorage.setItem("deviceId",deviceId);
+(function(){
+    // Initialize Firebase
+    var firebaseApp;
+    var firestore;
+    var db;
+
+    try{
+        firebaseHiddenApp = firebase.initializeApp(config_secret,"Hidden");
+        console.log('firebase initialized with config');
+    } catch(err) {
+        console.log('firebase.js: no internet connection');
+    }
+
+    firebase.auth().signInAnonymously().catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorMessage);
+    });
+    firebase.auth().onAuthStateChanged(user => {
+        if (user)
+        {
+          console.log('got user object from firebase');
+          console.log('isAnonymous='+user.isAnonymous);
+          // console.log(user);
+
+          db = firebase.firestore(firebaseHiddenApp);
+
+          var deviceRef = db.collection('devices').doc( 
+              this.localStorage.getItem("deviceId")
+          );
+          
+          deviceRef.get().then(function(doc) 
+          {
+            if (doc.exists) 
+            {
+                console.log("device data:", doc.data());
+                deviceGroupId = doc.data().deviceGroupId;
+
+                var devGrpRef = db.collection('device_groups').doc(deviceGroupId);
+                
+                devGrpRef.get().then(function(doc) 
+                {
+                  if (doc.exists) 
+                  {
+                      console.log("device group data:", doc.data());
+                      // deviceGroupId = doc.data().deviceGroupId;
+
+                      //get active playlist
+                      console.log("getting playlists for device group id="+deviceGroupId);
+
+                      var playlistRef = db.collection('playlists')
+                        .where("deviceGroupId", "==", deviceGroupId)
+                        .where("isActive", "==", true)
+                        ;
+
+                      playlistRef
+                        .get().then(function(doc) 
+                      {
+                        if (doc.size===1) 
+                        {
+                            var playlist = doc.docs[0];
+                            console.log("playlist data:", playlist.data());
+                            var uid = firebase.auth().currentUser.uid;
+                            //get playlist URLs
+                            var urlsRef = db
+                              // .ref('playlists/'+this.props.userID+'/'+this.props.playlistID+'/URLs/')
+                              .collection('URLs')
+                              .where("playlistId", "==", playlist.id);
+
+                            urlsRef
+                              // .orderBy("description","asc")
+                              .onSnapshot(snapshot => {
+                                var list= [];
+                                snapshot.forEach( doc => {
+                                    var data = doc.data();
+
+                                    list.push({
+                                        urlID: doc.id, //itemID
+                                        ...data,
+                                        playlistID: playlist.id,
+                                        userID: uid                          
+                                    });
+                                });
+
+                                console.log ("URLs="+JSON.stringify(list));
+                                //send ipc message to server with URLs
+
+                                require(['../node_modules/electron/electron'], function (electron) {
+                                    //electron is now loaded.
+                                    electron.ipcRenderer.send('view-set-url', list[0].url);
+                                });
+                            });
+
+                            
+                        } 
+                        else 
+                        {
+                            console.log("no active (or at all) playlists for device group " + deviceGroupId);
+                            // ???
+                        }
+                      });                      
+                  } 
+                  else 
+                  {
+                      console.log("device group doesn't exist");
+                      // ???
+                  }
+                });
+            } 
+            else 
+            {
+                console.log("device is not in FB");
+                //create device in devices
+                //create default device group for this device
+                //create def. playlist (isActive)
+                //add URL[s] to this playlist (about otot, onBoarding QR page)
+            }
+          });
+        }
+        else 
+        {
+          console.log('no user object from firebase. do nothing');
+        }
+    });
+}()); 
+</script>
+</body>
+</html>
